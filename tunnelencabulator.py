@@ -126,7 +126,7 @@ def panametric_fan_ports(unprivilegify=True):
 def surmount_host_line(host, ip, *, dest=None):
     """
     Now, basically, the only new principle involved is that instead of hostnames
-    being resolved by the relative motion of recursive and authoritative servers,
+    being resolved by the relative motion of recursive and authoritative nameservers,
     they are resolved instead by the modial interaction of gethostbyname and /etc/hosts.
     """
     return f"{ip:16}{host:32}" + (f"# {dest}\t" if dest else "") + MAGIC
