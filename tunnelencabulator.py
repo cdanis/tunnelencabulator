@@ -219,8 +219,8 @@ def main(args):
                           "please brew install socat or sudo port install socat")
                     return
 
-                [subprocess.run(["/usr/bin/sudo", "/sbin/ifconfig", "lo0", "alias", ip, "up"])
-                 for ip in prefabulate_tunnel().values()]
+                [subprocess.run(["/usr/bin/sudo", "/sbin/ifconfig", "lo0", "alias", ip, "up"],
+                                check=True) for ip in prefabulate_tunnel().values()]
 
                 replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
                 socat_commands = [
