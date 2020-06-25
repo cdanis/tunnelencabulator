@@ -54,3 +54,12 @@ add those entries to /etc/hosts as well.
 * Python 3.6+ (uses only standard libraries)
 * On Linux, `/usr/sbin/capsh` (part of Debian's base install)
 * On MacOS, `socat` installed somewhere
+
+## Acknowledgments
+
+* John Hellins Quick (1923-1991) & the _Student's Quarterly Journal_
+* Bernard Salwen & _Time Magazine_
+* the _General Electric Handbook_
+* Bud Haggart
+* [Elizabeth "Jake" Feinler](https://en.wikipedia.org/wiki/Elizabeth_J._Feinler), [Ken Harrenstien](https://www.deafpeople.com/dp_of_month/harrenstien.html), M. Stahl, & [SRI International](https://en.wikipedia.org/wiki/SRI_International), for [RFC952](https://tools.ietf.org/html/rfc952)
+* Markus Friedl, Niels Provos, Theo de Raadt, Kevin Steves, Damien Miller, Darren Tucker, Jason McIntyre, Tim Rice, Ben Lindstrom, & all the [OpenSSH](https://openssh.com) maintainers and contributors
