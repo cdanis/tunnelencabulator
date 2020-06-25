@@ -50,6 +50,7 @@ TEXT_CDN_HOSTS = [
 TUNNEL_HOSTS = {
     "gerrit": [443, 29418],
     "icinga": [443],
+    "idp": [443],
     "librenms": [443],
 }
 
