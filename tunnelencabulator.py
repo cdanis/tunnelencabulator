@@ -138,7 +138,7 @@ def apply_encabulation(lines, *, port_forwarding_dingle_arm=False, dest='ulsfo')
 
     tunnel_lines = []
     if port_forwarding_dingle_arm:
-        tunnel_lines = [surmount_host_line(host, ip) for (host, ip)
+        tunnel_lines = [surmount_host_line(host, ip, dest="ssh") for (host, ip)
                         in prefabulate_tunnel().items()]
 
     return itertools.chain(
@@ -209,7 +209,7 @@ def main(args):
               ("Rerun with --undo when you're done." if args.no_foreground
                else "Press Ctrl-C when you are done."))
         if args.ssh_tunnel:
-            print("Encabulating SSH tunnels now.")
+            print("Beginning encabulation of SSH tunnels now... make sure you authenticate.")
 
             # On MacOS, we need to both alias a bunch of loopback addresses, and also there's no
             # good way to bind to privileged ports as non-root.  So we kludge with socat.
