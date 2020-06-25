@@ -32,3 +32,25 @@ optional arguments:
   --ssh-args SSH_ARGS   Extra arguments to pass to the ssh girdle spring
   --version             show program's version number and exit
 ```
+
+## OK millennial, cut the copypasta crap and tell me what's going on
+~~OK boomer, sorry not sorry that you weren't paying attention when
+[your parents came up with this joke](https://en.wikipedia.org/wiki/Turboencabulator) ;)~~
+
+WMF serves a variety of tooling and infrastructure (monitoring/debugging tools, code repositories,
+bug trackers, etc) via its production network and CDN loadbalancers.
+
+This tool allows SREs, who maintain this infrastructure, to redirect their own traffic away from a
+malfunctioning location towards a working one, so they can effect repairs.
+
+It works via modifying /etc/hosts with alternate-PoP IP addresses for services that are multi-homed
+on our edge CDN.  For services that are not CDN-fronted, it can optionally (`-s`/`--ssh-tunnel`)
+create SSH tunnels each bound to a
+[different loopback address](https://en.wikipedia.org/wiki/Localhost#Name_resolution), and then
+add those entries to /etc/hosts as well.
+
+### Requirements
+* A Linux or MacOS system with `/usr/bin/sudo`
+* Python 3.6+ (uses only standard libraries)
+* On Linux, `/usr/sbin/capsh` (part of Debian's base install)
+* On MacOS, `socat` installed somewhere
