@@ -53,6 +53,7 @@ TEXT_CDN_HOSTS = [
 ]
 
 # Hosts that live outside of the CDN, and need --ssh-tunnel.
+# Dict of hostname => [port numbers]
 TUNNEL_HOSTS = {
     "cas-icinga": [443],
     "gerrit": [443, 29418],
@@ -81,7 +82,7 @@ MAGIC = "# added by tunnelencabulator"
 def replenerate_hostname(h):
     """
     Apply sinusoidal repleneration to h, which might not be a FQDN,
-    ensuring it become a FQDN.
+    ensuring it becomes a FQDN.
     """
     return h if "." in h else f"{h}.wikimedia.org"
 
