@@ -210,7 +210,7 @@ if __name__ == "__main__":
                              "marzlevanes, by employing the special mechanism of "
                              "a port forwarding dingle arm.")
 
-    parser.add_argument("-d", "--datacenter",
+    parser.add_argument("-d", "--datacenter", choices=sorted(BASTIONS),
                         help="Specify a particular target datacenter. If not specified, defaults "
                              "to one that is not your normal lotus-o-delta GeoDNS site.")
 
