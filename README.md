@@ -33,9 +33,12 @@ optional arguments:
   --version             show program's version number and exit
 ```
 
-## OK millennial, cut the copypasta crap and tell me what's going on
-~~OK boomer, sorry not sorry that you weren't paying attention when
-[your parents came up with this joke](https://en.wikipedia.org/wiki/Turboencabulator) ;)~~
+## Please, stop the copypasta and tell me what's going on
+This prose is based upon the [turboencabulator](https://en.wikipedia.org/wiki/Turboencabulator), a
+pile of glorious technobabble dating back to 1944.  Best known is the
+[original video](https://www.youtube.com/watch?v=Ac7G7xOG2Ag) from 1977, but there are
+[many](https://www.youtube.com/watch?v=MXW0bx_Ooq4)
+[others](https://www.youtube.com/watch?v=RXJKdh1KZ0w).
 
 WMF serves a variety of tooling and infrastructure (monitoring/debugging tools, code repositories,
 bug trackers, etc) via its production network and CDN loadbalancers.
@@ -54,6 +57,19 @@ add those entries to /etc/hosts as well.
 * Python 3.6+ (uses only standard libraries)
 * On Linux, `/usr/sbin/capsh` (part of Debian's base install)
 * On MacOS, `socat` installed somewhere
+
+### Usage
+
+Just run `tunnelencabulator.py`.
+
+You can get SSH tunnels to non-CDN services (gerrit, icinga, etc) with `-s`.
+If you need to debug the SSH connection, `--ssh-args=-v`.
+
+Normally tunnelencabulator stays in the foreground, and cleans up after itself when you press Ctrl-C.
+If you'd rather the opposite, pass `-f`.  Then `--undo` when you're done.
+
+Normally tunnelencabulator consults GeoDNS to see what datacenter your traffic would go to, and then
+routes to some other datacenter.  If you want to pick a specific one, provide it as an argument to `-d`.
 
 ## Acknowledgments
 
