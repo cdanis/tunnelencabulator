@@ -28,6 +28,7 @@ import itertools
 import os
 import platform
 import shlex
+import shutil
 import socket
 import subprocess
 import sys
@@ -213,17 +214,17 @@ def main(args):
             # On MacOS, we need to both alias a bunch of loopback addresses, and also there's no
             # good way to bind to privileged ports as non-root.  So we kludge with socat.
             if platform.system() == "Darwin":
-                if not os.path.exists("/usr/bin/socat"):
-                    print("Sorry, /usr/bin/socat is needed :( "
+                if not shutil.which("socat"):
+                    print("Sorry, a socat binary is needed :( "
                           "please brew install socat or sudo port install socat")
                     return
 
-                [subprocess.run("/sbin/ifconfig", "lo0", "alias", ip, "up")
+                [subprocess.run(["/sbin/ifconfig", "lo0", "alias", ip, "up"])
                  for ip in prefabulate_tunnel().values()]
 
                 replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
                 socat_commands = [
-                    ["/usr/bin/sudo", "/usr/bin/socat",
+                    ["/usr/bin/sudo", "socat",
                      f"tcp4-listen:{port},fork,bind={ip},su=nobody",
                      f"tcp4:{ip}:{unprivilegify_port(port)}"]
                     for (host, ip) in prefabulate_tunnel().items()
