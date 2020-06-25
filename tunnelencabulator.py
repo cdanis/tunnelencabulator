@@ -156,7 +156,7 @@ def rewrite_hosts(fn, *, etchosts):
             tmp.write("\n".join(new_contents))
             tmp.write("\n")
             tmp.flush()
-            p = subprocess.run(['/usr/bin/sudo', '/usr/bin/install', '--backup=numbered', '-T',
+            p = subprocess.run(['/usr/bin/sudo', '/usr/bin/install', '-b',
                                 '-o', 'root', '-g', 'root', '-m', '644',
                                tmp.name, etchosts])
             p.check_returncode()
