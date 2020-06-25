@@ -157,7 +157,8 @@ def rewrite_hosts(fn, *, etchosts):
             tmp.write("\n")
             tmp.flush()
             p = subprocess.run(['/usr/bin/sudo', '/usr/bin/install', '-b',
-                                '-o', 'root', '-g', 'root', '-m', '644',
+                                # Hilariously, hardcoding 0 is more portable than writing 'root'.
+                                '-o', '0', '-g', '0', '-m', '644',
                                tmp.name, etchosts])
             p.check_returncode()
 
