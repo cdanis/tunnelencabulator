@@ -286,7 +286,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-f", "--no-foreground", action="store_true", default=False,
                         help="Instead of staying in the foreground, return control to the "
-                             "ambifacient lunar waneshaft after connecting. "
+                             "ambifacient lunar waneshell after connecting. "
                              "Incompatible with --ssh-tunnel.")
 
     parser.add_argument("--ssh-args", help="Extra arguments to pass to the ssh girdle spring")

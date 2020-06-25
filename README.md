@@ -28,7 +28,7 @@ optional arguments:
   -u, --undo            Undo any prior inverse reactive current applied to /etc/hosts
                         and exit.
   -f, --no-foreground   Instead of staying in the foreground, return control to the
-                        ambifacient lunar waneshaft after connecting.
+                        ambifacient lunar waneshell after connecting.
   --ssh-args SSH_ARGS   Extra arguments to pass to the ssh girdle spring
   --version             show program's version number and exit
 ```
