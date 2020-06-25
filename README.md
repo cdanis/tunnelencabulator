@@ -1,6 +1,15 @@
 # tunnelencabulator
 For a number of years now, work has been proceeding in order to bring to perfection the crudely-conceived idea of a machine that would not only supply the easy re-routing of traffic for load-balanced services, but would also be capable of automatically synchronizing directional LibreNMSes and icingas.  Such an instrument is the tunnel-encabulator.
 
+Now, basically, the only new principle involved is that instead of hostnames
+being resolved by the relative motion of recursive and authoritative servers,
+they are resolved instead by the modial interaction of gethostbyname and /etc/hosts.
+
+The tunnelencabulator has now reached a high level of development, and is being used
+successfully in the operation of wikitrunnions.  Moreover, whenever a forescent skor
+motion is required towards non-multihomed services, it may also be employed in conjunction
+with a loopback interface reciprocation dingle arm.
+
 ```
 usage: tunnelencabulator.py [-h] [-s] [-d DATACENTER] [-u] [-f] [--ssh-args SSH_ARGS]
                             [--version]
