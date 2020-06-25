@@ -164,10 +164,8 @@ def rewrite_hosts(fn, *, etchosts):
 
 
 def main(args):
-    # To avoid weird inconsistencies, always begin by undoing encabulation.
-    rewrite_hosts(undo_encabulation, etchosts=args.etc_hosts)
-
     if args.undo:
+        rewrite_hosts(undo_encabulation, etchosts=args.etc_hosts)
         print("Disencabulation complete.")
         return
 
@@ -181,8 +179,9 @@ def main(args):
         dcs.remove(current_dc)
         dest = dcs[0]
 
+    # To avoid weird inconsistencies, always begin by undoing encabulation.
     rewrite_hosts(
-        functools.partial(apply_encabulation, port_forwarding_dingle_arm=args.ssh_tunnel, dest=dest),
+        lambda x: apply_encabulation(undo_encabulation(x), port_forwarding_dingle_arm=args.ssh_tunnel, dest=dest),
         etchosts=args.etc_hosts)
 
     try:
