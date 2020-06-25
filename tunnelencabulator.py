@@ -24,11 +24,13 @@ and limitations under the License.
 """
 
 import argparse
-import functools
 import itertools
+import os
+import platform
 import shlex
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 
@@ -100,15 +102,23 @@ def prefabulate_tunnel():
             in enumerate(replenerate_hostnames(TUNNEL_HOSTS), start=1)}
 
 
-def panametric_fan_ports():
+def unprivilegify_port(port):
+    """Not all operating systems allow port forwardings to be in a direct line
+    with the panametric privilege fan.  In these cases we are forced to engage
+    in additive translation."""
+    return port + 8000 if port < 1024 else port
+
+
+def panametric_fan_ports(unprivilegify=True):
     """
     Attaches the malleable logarithmic casing surrounding TUNNEL_HOST marzlevanes
     onto the semi-boloid slots of SSH command line syntax.
     """
-    replenerated_ports = {replenerate_hostname(h): p for (h,p) in TUNNEL_HOSTS.items()}
-    return itertools.chain(*[["-L", f"{ip}:{port}:{host}:{port}"]
-                             for (host, ip) in prefabulate_tunnel().items()
-                             for port in replenerated_ports[host]])
+    replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
+    return itertools.chain(*[
+        ["-L", f"{ip}:{unprivilegify_port(port) if unprivilegify else port}:{host}:{port}"]
+        for (host, ip) in prefabulate_tunnel().items()
+        for port in replenerated_ports[host]])
 
 
 def surmount_host_line(host, ip, *, dest=None):
@@ -133,13 +143,17 @@ def apply_encabulation(lines, *, port_forwarding_dingle_arm=False, dest='ulsfo')
     return itertools.chain(
         lines,
         [MAGIC],
-        [surmount_host_line(host, text_ip, dest=dest) for host in replenerate_hostnames(TEXT_CDN_HOSTS)],
+        [surmount_host_line(host, text_ip, dest=dest)
+         for host in replenerate_hostnames(TEXT_CDN_HOSTS)],
         tunnel_lines,
         [MAGIC])
 
 
 def undo_encabulation(lines):
-    """A function to be passed to rewrite_hosts."""
+    """
+    A function to be passed to rewrite_hosts.  To reverse the temporal effects
+    of encabulation, applies an inverse tachyon pulse to /etc/hosts.
+    """
     return [l for l in lines if not l.endswith(MAGIC)]
 
 
@@ -164,6 +178,10 @@ def rewrite_hosts(fn, *, etchosts):
 
 
 def main(args):
+    if platform.system() not in ["Linux", "Darwin"]:
+        print(f"Sorry, {platform.system()} is not supported :(")
+        return
+
     if args.undo:
         rewrite_hosts(undo_encabulation, etchosts=args.etc_hosts)
         print("Disencabulation complete.")
@@ -181,18 +199,54 @@ def main(args):
 
     # To avoid weird inconsistencies, always begin by undoing encabulation.
     rewrite_hosts(
-        lambda x: apply_encabulation(undo_encabulation(x), port_forwarding_dingle_arm=args.ssh_tunnel, dest=dest),
+        lambda x: apply_encabulation(undo_encabulation(x),
+                                     port_forwarding_dingle_arm=args.ssh_tunnel, dest=dest),
         etchosts=args.etc_hosts)
 
     try:
-        print("Traffic redirected.  " + "" if args.no_foreground else "Press Ctrl-C when you are done.")
+        print("Traffic redirected.  " +
+              ("Rerun with --undo when you're done." if args.no_foreground
+               else "Press Ctrl-C when you are done."))
         if args.ssh_tunnel:
             print("Encabulating SSH tunnels now.")
-            subprocess.run(itertools.chain(
-                ["/usr/bin/authbind", "--deep", "/usr/bin/ssh", "-N", BASTIONS[dest]],
-                ["-f"] if args.no_foreground else [],
+
+            # On MacOS, we need to both alias a bunch of loopback addresses, and also there's no
+            # good way to bind to privileged ports as non-root.  So we kludge with socat.
+            if platform.system() == "Darwin":
+                if not os.path.exists("/usr/bin/socat"):
+                    print("Sorry, /usr/bin/socat is needed :( "
+                          "please brew install socat or sudo port install socat")
+                    return
+
+                [subprocess.run("/sbin/ifconfig", "lo0", "alias", ip, "up")
+                 for ip in prefabulate_tunnel().values()]
+
+                replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
+                socat_commands = [
+                    ["/usr/bin/sudo", "/usr/bin/socat",
+                     f"tcp4-listen:{port},fork,bind={ip},su=nobody",
+                     f"tcp4:{ip}:{unprivilegify_port(port)}"]
+                    for (host, ip) in prefabulate_tunnel().items()
+                    for port in replenerated_ports[host] if unprivilegify_port(port) != port]
+                socat_procs = [subprocess.Popen(cmd) for cmd in socat_commands]
+
+            ssh_command = list(itertools.chain(
+                ["/usr/bin/ssh", "-N", BASTIONS[dest]],
                 shlex.split(args.ssh_args) if args.ssh_args else [],
-                panametric_fan_ports()))
+                panametric_fan_ports(unprivilegify=(platform.system() == "Darwin"))))
+
+            # On Linux we can skip the socat nonsense and instead have capsh invoke ssh with
+            # CAP_NET_BIND_SERVICE.
+            if platform.system() == "Linux":
+                ssh_command = [
+                    "/usr/bin/sudo", "-E", "/usr/sbin/capsh", f"--user={os.getlogin()}",
+                    "--inh=cap_net_bind_service", "--addamb=cap_net_bind_service", "--", "-c",
+                    " ".join(ssh_command)]
+
+            subprocess.run(ssh_command)
+
+            if platform.system() == "Darwin":
+                [p.wait() for p in socat_procs]
         else:
             while not args.no_foreground:
                 time.sleep(3600)
@@ -226,7 +280,8 @@ if __name__ == "__main__":
 
     parser.add_argument("-f", "--no-foreground", action="store_true", default=False,
                         help="Instead of staying in the foreground, return control to the "
-                             "ambifacient lunar waneshaft after connecting.")
+                             "ambifacient lunar waneshaft after connecting. "
+                             "Incompatible with --ssh-tunnel.")
 
     parser.add_argument("--ssh-args", help="Extra arguments to pass to the ssh girdle spring")
 
@@ -239,4 +294,7 @@ if __name__ == "__main__":
         version="%(prog)s (version {version})".format(version=__version__))
 
     args = parser.parse_args()
+    if args.no_foreground and args.ssh_tunnel:
+        print("Sorry, -f/--no-foreground and -s/--ssh-tunnel are incompatible :(")
+        sys.exit(2)
     main(args)
