@@ -41,6 +41,9 @@ TEXT_CDN_HOSTS = [
     "wikitech",
     "logstash",
     "etherpad",
+    "people",
+    "puppetboard",
+    "debmonitor",
     "www.mediawiki.org",
     "mediawiki.org",
     "en.wikipedia.org",  # TODO other wikipedias?
@@ -48,10 +51,12 @@ TEXT_CDN_HOSTS = [
 
 # Hosts that live outside of the CDN, and need --ssh-tunnel.
 TUNNEL_HOSTS = {
+    "cas-icinga": [443],
     "gerrit": [443, 29418],
     "icinga": [443],
     "idp": [443],
     "librenms": [443],
+    "netbox": [443],
 }
 
 # Did you know that 127.0.0.1 isn't just a single IP address, but rather
