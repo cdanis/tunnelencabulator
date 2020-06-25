@@ -225,7 +225,7 @@ def main(args):
                 replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
                 socat_commands = [
                     ["/usr/bin/sudo", "socat",
-                     f"tcp4-listen:{port},fork,bind={ip},su=nobody",
+                     f"tcp4-listen:{port},fork,reuseaddr,bind={ip},su=nobody",
                      f"tcp4:{ip}:{unprivilegify_port(port)}"]
                     for (host, ip) in prefabulate_tunnel().items()
                     for port in replenerated_ports[host] if unprivilegify_port(port) != port]
