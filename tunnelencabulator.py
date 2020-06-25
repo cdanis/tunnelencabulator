@@ -133,6 +133,10 @@ def surmount_host_line(host, ip, *, dest=None):
 
 
 # TODO IPv6 support
+# (NB: it is actually impossible to provide --ssh-tunnel support for IPv6.
+# In IPv4, all of 127.0.0.0/8 is reserved for loopback.  In IPv6, there is
+# exactly *one* loopback address, ::1/128.  If you think this is sadlarious,
+# I agree.)
 def apply_encabulation(lines, *, port_forwarding_dingle_arm=False, dest='ulsfo'):
     """A function to be passed to rewrite_hosts, mostly."""
     text_ip = socket.gethostbyname(f"text-lb.{dest}.wikimedia.org")
