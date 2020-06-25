@@ -7,7 +7,7 @@ single-homed LibreNMSes and icingas.  Such an instrument is the tunnel-encabulat
 """
 
 __author__ = "Chris Danis"
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 __license__ = "Apache 2.0"
 __copyright__ = """
 Copyright © 2020 Chris Danis & the Wikimedia Foundation
