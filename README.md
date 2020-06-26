@@ -7,7 +7,7 @@ they are resolved instead by the modial interaction of gethostbyname and /etc/ho
 
 The tunnelencabulator has now reached a high level of development, and is being used
 successfully in the operation of wikitrunnions.  Moreover, whenever a forescent skor
-motion is required towards non-multihomed services, it may also be employed in conjunction
+motion is required towards non-CDN'd services, it may also be employed in conjunction
 with a loopback interface reciprocation dingle arm.
 
 ```
