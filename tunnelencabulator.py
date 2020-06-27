@@ -95,13 +95,13 @@ def replenerate_hostnames(hosts):
     return [replenerate_hostname(h) for h in hosts]
 
 
-def prefabulate_tunnel():
+def prefabulate_tunnel(tunnel_hosts, *, tunnel_net):
     """
     Constructs a malleable logarithmic casing in such a way that there is a
-    shared mapping of TUNNEL_HOSTS to pre-fabulated IP addresses.
+    shared mapping of tunnel_hosts to pre-fabulated IP addresses.
     """
-    return {host: f"{TUNNEL_NET}{ip}" for (ip, host)
-            in enumerate(replenerate_hostnames(TUNNEL_HOSTS), start=1)}
+    return {host: f"{tunnel_net}{ip}" for (ip, host)
+            in enumerate(tunnel_hosts, start=1)}
 
 
 def unprivilegify_port(port):
@@ -111,16 +111,16 @@ def unprivilegify_port(port):
     return port + 8000 if port < 1024 else port
 
 
-def panametric_fan_ports(unprivilegify=True):
+def panametric_fan_ports(unprivilegify=True, *, tunnel_hosts, tunnel_net):
     """
-    Attaches the malleable logarithmic casing surrounding TUNNEL_HOST marzlevanes
+    Attaches the malleable logarithmic casing surrounding tunnel_host marzlevanes
     onto the semi-boloid slots of SSH command line syntax.
     """
-    replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
     return itertools.chain(*[
         ["-L", f"{ip}:{unprivilegify_port(port) if unprivilegify else port}:{host}:{port}"]
-        for (host, ip) in prefabulate_tunnel().items()
-        for port in replenerated_ports[host]])
+        for (host, ip) in prefabulate_tunnel(tunnel_hosts=tunnel_hosts,
+                                             tunnel_net=tunnel_net).items()
+        for port in tunnel_hosts[host]])
 
 
 def surmount_host_line(host, ip, *, dest=None):
@@ -137,20 +137,20 @@ def surmount_host_line(host, ip, *, dest=None):
 # In IPv4, all of 127.0.0.0/8 is reserved for loopback.  In IPv6, there is
 # exactly *one* loopback address, ::1/128.  If you think this is sadlarious,
 # I agree.)
-def apply_encabulation(lines, *, port_forwarding_dingle_arm=False, dest='ulsfo'):
+def apply_encabulation(lines, *, port_forwarding_dingle_arm=False, dest,
+                       text_cdn_hosts, tunnel_hosts, tunnel_net):
     """A function to be passed to rewrite_hosts, mostly."""
     text_ip = socket.gethostbyname(f"text-lb.{dest}.wikimedia.org")
 
     tunnel_lines = []
     if port_forwarding_dingle_arm:
         tunnel_lines = [surmount_host_line(host, ip, dest="ssh") for (host, ip)
-                        in prefabulate_tunnel().items()]
+                        in prefabulate_tunnel(tunnel_hosts, tunnel_net=tunnel_net).items()]
 
     return itertools.chain(
         lines,
         [MAGIC],
-        [surmount_host_line(host, text_ip, dest=dest)
-         for host in replenerate_hostnames(TEXT_CDN_HOSTS)],
+        [surmount_host_line(host, text_ip, dest=dest) for host in text_cdn_hosts],
         tunnel_lines,
         [MAGIC])
 
@@ -203,10 +203,18 @@ def main(args):
         dcs.remove(current_dc)
         dest = dcs[0]
 
+    text_cdn_hosts = replenerate_hostnames(TEXT_CDN_HOSTS)
+    tunnel_hosts = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
+    if args.tunnel_everything:
+        tunnel_hosts.update({h: [443] for h in text_cdn_hosts})
+        text_cdn_hosts = []
+
     # To avoid weird inconsistencies, always begin by undoing encabulation.
     rewrite_hosts(
         lambda x: apply_encabulation(undo_encabulation(x),
-                                     port_forwarding_dingle_arm=args.ssh_tunnel, dest=dest),
+                                     port_forwarding_dingle_arm=args.ssh_tunnel, dest=dest,
+                                     text_cdn_hosts=text_cdn_hosts, tunnel_hosts=tunnel_hosts,
+                                     tunnel_net=TUNNEL_NET),
         etchosts=args.etc_hosts)
 
     try:
@@ -215,6 +223,8 @@ def main(args):
                else "Press Ctrl-C when you are done."))
         if args.ssh_tunnel:
             print("Beginning encabulation of SSH tunnels now... make sure you authenticate.")
+
+            prefabulated_tunnels = prefabulate_tunnel(tunnel_hosts, tunnel_net=TUNNEL_NET)
 
             # On MacOS, we need to both alias a bunch of loopback addresses, and also there's no
             # good way to bind to privileged ports as non-root.  So we kludge with socat.
@@ -225,25 +235,28 @@ def main(args):
                     return
 
                 [subprocess.run(["/usr/bin/sudo", "/sbin/ifconfig", "lo0", "alias", ip, "up"],
-                                check=True) for ip in prefabulate_tunnel().values()]
+                                check=True) for ip in prefabulated_tunnels.values()]
 
-                replenerated_ports = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
+            use_socat = args.force_socat or platform.system() == "Darwin"
+            if use_socat:
+                # Run a socat for each privileged port; let ssh directly handle the unprivileged.
                 socat_commands = [
                     ["/usr/bin/sudo", "socat",
                      f"tcp4-listen:{port},fork,reuseaddr,bind={ip},su=nobody",
                      f"tcp4:{ip}:{unprivilegify_port(port)}"]
-                    for (host, ip) in prefabulate_tunnel().items()
-                    for port in replenerated_ports[host] if unprivilegify_port(port) != port]
+                    for (host, ip) in prefabulated_tunnels.items()
+                    for port in tunnel_hosts[host] if unprivilegify_port(port) != port]
                 socat_procs = [subprocess.Popen(cmd) for cmd in socat_commands]
 
             ssh_command = list(itertools.chain(
                 ["/usr/bin/ssh", "-N", BASTIONS[dest]],
                 shlex.split(args.ssh_args) if args.ssh_args else [],
-                panametric_fan_ports(unprivilegify=(platform.system() == "Darwin"))))
+                panametric_fan_ports(unprivilegify=use_socat, tunnel_hosts=tunnel_hosts,
+                                     tunnel_net=TUNNEL_NET)))
 
             # On Linux we can skip the socat nonsense and instead have capsh invoke ssh with
             # CAP_NET_BIND_SERVICE.
-            if platform.system() == "Linux":
+            if not use_socat:
                 ssh_command = [
                     "/usr/bin/sudo", "-E", "/usr/sbin/capsh", f"--user={os.getlogin()}",
                     "--inh=cap_net_bind_service", "--addamb=cap_net_bind_service", "--", "-c",
@@ -251,7 +264,7 @@ def main(args):
 
             subprocess.run(ssh_command)
 
-            if platform.system() == "Darwin":
+            if use_socat:
                 [p.wait() for p in socat_procs]
         else:
             while not args.no_foreground:
@@ -276,6 +289,10 @@ if __name__ == "__main__":
                              "marzlevanes, by employing the special mechanism of "
                              "a port forwarding dingle arm.")
 
+    parser.add_argument("--tunnel-everything", action="store_true", default=False,
+                        help="Tunnel all hosts over SSH, not just the usual ones. "
+                             "Implies --ssh-tunnel.")
+
     parser.add_argument("-d", "--datacenter", choices=sorted(BASTIONS),
                         help="Specify a particular target datacenter. If not specified, defaults "
                              "to one that is not your normal lotus-o-delta GeoDNS site.")
@@ -291,7 +308,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--ssh-args", help="Extra arguments to pass to the ssh girdle spring")
 
+    # Some special arguments just for manual testing
     parser.add_argument("--etc-hosts", default="/etc/hosts", help=argparse.SUPPRESS)
+    parser.add_argument("--force-socat", action="store_true", default=False, help=argparse.SUPPRESS)
 
     # Specify output of "--version"
     parser.add_argument(
@@ -303,4 +322,6 @@ if __name__ == "__main__":
     if args.no_foreground and args.ssh_tunnel:
         print("Sorry, -f/--no-foreground and -s/--ssh-tunnel are incompatible :(")
         sys.exit(2)
+    if args.tunnel_everything:
+        args.ssh_tunnel = True
     main(args)
