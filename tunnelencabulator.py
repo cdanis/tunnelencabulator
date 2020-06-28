@@ -47,6 +47,7 @@ TEXT_CDN_HOSTS = [
     "people",
     "puppetboard",
     "debmonitor",
+    "w.wiki",
     "www.mediawiki.org",
     "mediawiki.org",
     "en.wikipedia.org",  # TODO other wikipedias?
