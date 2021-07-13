@@ -196,13 +196,9 @@ def main(args):
 
     dest = args.datacenter
     if not dest:
-        # Figure out some site other than what GeoDNS would send us to.
-        # TODO make this be the nearest site instead of arbitrary?
-        geodns_host, _, _ = socket.gethostbyaddr(socket.gethostbyname("dyna.wikimedia.org"))
-        current_dc = geodns_host.split(".")[1]
-        dcs = list(BASTIONS)
-        dcs.remove(current_dc)
-        dest = dcs[0]
+        # (Ab)use NEL endpoints to retrieve next-best location to send traffic to
+        geodns_next_host, _, _ = socket.gethostbyaddr(socket.gethostbyname("intake-logging.wikimedia.org"))
+        dest = geodns_next_host.split(".")[1]
 
     text_cdn_hosts = replenerate_hostnames(TEXT_CDN_HOSTS)
     tunnel_hosts = {replenerate_hostname(h): p for (h, p) in TUNNEL_HOSTS.items()}
