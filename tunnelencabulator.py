@@ -219,7 +219,7 @@ def main(args):
         etchosts=args.etc_hosts)
 
     try:
-        print("Traffic redirected.  " +
+        print(f"Traffic redirected via {dest}.  " +
               ("Rerun with --undo when you're done." if args.no_foreground
                else "Press Ctrl-C when you are done."))
         if args.ssh_tunnel:
