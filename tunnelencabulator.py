@@ -70,11 +70,11 @@ TUNNEL_HOSTS = {
 TUNNEL_NET = "127.149.7."  # There's no place like AS14907
 
 BASTIONS = {
-    'eqiad': 'bast1002.wikimedia.org',
+    'eqiad': 'bast1003.wikimedia.org',
     'codfw': 'bast2002.wikimedia.org',
-    'esams': 'bast3004.wikimedia.org',
-    'ulsfo': 'bast4002.wikimedia.org',
-    'eqsin': 'bast5001.wikimedia.org',
+    'esams': 'bast3005.wikimedia.org',
+    'ulsfo': 'bast4003.wikimedia.org',
+    'eqsin': 'bast5002.wikimedia.org',
 }
 
 MAGIC = "# added by tunnelencabulator"
