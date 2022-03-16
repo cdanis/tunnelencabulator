@@ -75,6 +75,7 @@ BASTIONS = {
     'esams': 'bast3005.wikimedia.org',
     'ulsfo': 'bast4003.wikimedia.org',
     'eqsin': 'bast5002.wikimedia.org',
+    'drmrs': 'bast6001.wikimedia.org',
 }
 
 MAGIC = "# added by tunnelencabulator"
