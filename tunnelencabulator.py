@@ -69,13 +69,17 @@ TUNNEL_HOSTS = {
 # approximately $335.5M USD.
 TUNNEL_NET = "127.149.7."  # There's no place like AS14907
 
+# Get the current mapping with:
+# cumin --force -o txt 'O:bastionhost' 'cat /etc/wikimedia-cluster' | \
+#    awk 'x==1 { gsub(":", "", $1) ; printf "\047%s\047: \047%s\047,\n", $2, $1 } \
+#         /_____FORMATTED_OUTPUT_____/ { x=1 }'
 BASTIONS = {
     'eqiad': 'bast1003.wikimedia.org',
     'codfw': 'bast2002.wikimedia.org',
-    'esams': 'bast3005.wikimedia.org',
-    'ulsfo': 'bast4003.wikimedia.org',
-    'eqsin': 'bast5002.wikimedia.org',
-    'drmrs': 'bast6001.wikimedia.org',
+    'esams': 'bast3006.wikimedia.org',
+    'ulsfo': 'bast4004.wikimedia.org',
+    'eqsin': 'bast5003.wikimedia.org',
+    'drmrs': 'bast6002.wikimedia.org',
 }
 
 MAGIC = "# added by tunnelencabulator"
