@@ -39,7 +39,6 @@ import time
 # Hosts fronted by text-lb.
 TEXT_CDN_HOSTS = [
     "grafana",
-    "alerts",
     "phabricator",
     "turnilo",
     "wikitech",
@@ -60,6 +59,7 @@ TUNNEL_HOSTS = {
     "cas-icinga": [443],
     "gerrit": [443, 29418],
     "icinga": [443],
+    "alerts": [443],
     "idp": [443],
     "librenms": [443],
     "netbox": [443],
