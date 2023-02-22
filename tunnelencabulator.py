@@ -39,6 +39,7 @@ import time
 # Hosts fronted by text-lb.
 TEXT_CDN_HOSTS = [
     "grafana",
+    "alerts",
     "phabricator",
     "turnilo",
     "wikitech",
