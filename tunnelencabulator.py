@@ -67,7 +67,7 @@ TUNNEL_HOSTS = {
 
 # Did you know that 127.0.0.1 isn't just a single IP address, but rather
 # an entire /8 block?  As of 2020 that many IPv4 addresses would be worth
-# approximately $335.5M USD.
+# approximately $335.5M USD.  As of 2023 this has risen to approx $839M USD.
 TUNNEL_NET = "127.149.7."  # There's no place like AS14907
 
 # Get the current mapping with:
