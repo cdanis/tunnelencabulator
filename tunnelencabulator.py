@@ -90,6 +90,13 @@ def replenerate_hostname(h):
     """
     Apply sinusoidal repleneration to h, which might not be a FQDN,
     ensuring it becomes a FQDN.
+
+    >>> replenerate_hostname('grafana.wikimedia.org')
+    'grafana.wikimedia.org'
+    >>> replenerate_hostname('codesearch.wmcloud.org')
+    'codesearch.wmcloud.org'
+    >>> replenerate_hostname('grafana')
+    'grafana.wikimedia.org'
     """
     return h if "." in h else f"{h}.wikimedia.org"
 
@@ -106,6 +113,13 @@ def prefabulate_tunnel(tunnel_hosts, *, tunnel_net):
     """
     Constructs a malleable logarithmic casing in such a way that there is a
     shared mapping of tunnel_hosts to pre-fabulated IP addresses.
+
+    >>> prefabulate_tunnel([], tunnel_net=TUNNEL_NET)
+    {}
+    >>> prefabulate_tunnel(['icinga.wikimedia.org'], tunnel_net=TUNNEL_NET)
+    {'icinga.wikimedia.org': '127.149.7.1'}
+    >>> prefabulate_tunnel(['icinga', 'librenms', 'third'], tunnel_net=TUNNEL_NET)
+    {'icinga': '127.149.7.1', 'librenms': '127.149.7.2', 'third': '127.149.7.3'}
     """
     return {host: f"{tunnel_net}{ip}" for (ip, host)
             in enumerate(tunnel_hosts, start=1)}
@@ -114,7 +128,13 @@ def prefabulate_tunnel(tunnel_hosts, *, tunnel_net):
 def unprivilegify_port(port):
     """Not all operating systems allow port forwardings to be in a direct line
     with the panametric privilege fan.  In these cases we are forced to engage
-    in additive translation."""
+    in additive translation.
+
+    >>> unprivilegify_port(8080)
+    8080
+    >>> unprivilegify_port(22)
+    8022
+    """
     return port + 8000 if port < 1024 else port
 
 
@@ -166,6 +186,11 @@ def undo_encabulation(lines):
     """
     A function to be passed to rewrite_hosts.  To reverse the temporal effects
     of encabulation, applies an inverse tachyon pulse to /etc/hosts.
+
+    >>> undo_encabulation([MAGIC, MAGIC, '# foobar ' + MAGIC])
+    []
+    >>> undo_encabulation(['asdf 1.1.1.1', MAGIC, '# qwerty', MAGIC])
+    ['asdf 1.1.1.1', '# qwerty']
     """
     return [l for l in lines if not l.endswith(MAGIC)]
 
@@ -314,6 +339,9 @@ if __name__ == "__main__":
     # Some special arguments just for manual testing
     parser.add_argument("--etc-hosts", default="/etc/hosts", help=argparse.SUPPRESS)
     parser.add_argument("--force-socat", action="store_true", default=False, help=argparse.SUPPRESS)
+    parser.add_argument("--self-test", action="store_true", default=False, help=argparse.SUPPRESS)
+    parser.add_argument("-v", "--verbose", action="store_true", default=False,
+                        help=argparse.SUPPRESS)
 
     # Specify output of "--version"
     parser.add_argument(
@@ -327,4 +355,7 @@ if __name__ == "__main__":
         sys.exit(2)
     if args.tunnel_everything:
         args.ssh_tunnel = True
+    if args.self_test:
+        import doctest
+        sys.exit(doctest.testmod(verbose=args.verbose)[0])
     main(args)
