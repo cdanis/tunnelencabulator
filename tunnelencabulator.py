@@ -41,6 +41,7 @@ TEXT_CDN_HOSTS = [
     "grafana",
     "phabricator",
     "turnilo",
+    "superset",
     "wikitech",
     "logstash",
     "etherpad",
